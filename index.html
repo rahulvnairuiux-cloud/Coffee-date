@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Coffee Date? ☕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@500;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(160deg, #ffe0f0, #ffc8e8, #ffb0e0);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ── Floating hearts ── */
+    .heart {
+      position: fixed;
+      pointer-events: none;
+      animation: rise linear infinite;
+      z-index: 0;
+      opacity: 0;
+    }
+    @keyframes rise {
+      0%   { transform: translateY(100vh); opacity: 0; }
+      5%   { opacity: 0.25; }
+      95%  { opacity: 0.25; }
+      100% { transform: translateY(-10vh); opacity: 0; }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border-radius: 32px;
+      padding: 40px 28px 36px;
+      width: 88vw;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(255, 80, 150, 0.2);
+      position: relative;
+      z-index: 10;
+    }
+
+    .emoji { font-size: 68px; display: block; margin-bottom: 16px; animation: bob 2s ease-in-out infinite; }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+    h1 { font-family: 'Pacifico', cursive; color: #f0609e; font-size: 28px; margin-bottom: 10px; }
+    p  { color: #c070a0; font-size: 16px; line-height: 1.6; margin-bottom: 28px; }
+
+    /* ── YES button ── */
+    #yesBtn {
+      background: linear-gradient(135deg, #ff6bab, #ff2d78);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      padding: 16px 48px;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(255,45,120,0.35);
+      transition: padding 0.5s ease, font-size 0.5s ease, box-shadow 0.3s;
+      display: block;
+      margin: 0 auto 16px;
+      position: relative;
+      z-index: 10;
+    }
+    #yesBtn:active { transform: scale(0.96); }
+
+    /* ── NO button — fixed to the page so it can roam freely ── */
+    #noBtn {
+      position: fixed;
+      background: #eee;
+      color: #aaa;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 12px 28px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      z-index: 9999;
+      transition: left 0.18s cubic-bezier(.23,1.4,.32,1), top 0.18s cubic-bezier(.23,1.4,.32,1);
+    }
+
+    /* ── Form screen ── */
+    #formScreen { display: none; animation: popIn 0.4s ease; }
+    @keyframes popIn { from{opacity:0;transform:scale(0.88)} to{opacity:1;transform:scale(1)} }
+
+    input {
+      width: 100%;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: 2.5px solid #ffb3d9;
+      border-radius: 999px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #c060a0;
+      background: #fff8fc;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input::placeholder { color: #e8a0c8; }
+    input:focus { border-color: #ff6bab; }
+
+    .sendBtn {
+      background: linear-gradient(135deg, #ff6bab, #ff2d78);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 15px 0;
+      width: 100%;
+      margin-top: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255,45,120,0.3);
+    }
+    .sendBtn:active { transform: scale(0.97); }
+
+    /* ── Success screen ── */
+    #doneScreen { display: none; animation: popIn 0.4s ease; }
+    .bigSparkle { font-size: 64px; display: block; margin-bottom: 16px; animation: bob 2s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+  <!-- NO button floats freely on page -->
+  <button id="noBtn" onclick="handleNo()">No 😐</button>
+
+  <div class="card">
+
+    <!-- Screen 1: The question -->
+    <div id="askScreen">
+      <span class="emoji">☕💕</span>
+      <h1>Coffee Date?</h1>
+      <p>Would you like to grab coffee with me?<br>I promise it'll be amazing! ✨</p>
+      <button id="yesBtn" onclick="handleYes()">Yes! 💖</button>
+    </div>
+
+    <!-- Screen 2: Enter details -->
+    <div id="formScreen">
+      <span class="emoji">🥰</span>
+      <h1>Yay!! 🎉</h1>
+      <p>Drop your details and I'll text you to plan it~ 💌</p>
+      <input id="nameInput" type="text" placeholder="Your name 💫" />
+      <input id="phoneInput" type="tel" placeholder="Your number 📱" />
+      <button class="sendBtn" onclick="handleSend()">Send to me! 💌</button>
+    </div>
+
+    <!-- Screen 3: All done -->
+    <div id="doneScreen">
+      <span class="bigSparkle">🎊💖✨</span>
+      <h1>Got it! 💕</h1>
+      <p>I'll text you soon to set up our coffee date!<br>Can't wait ☕🌸</p>
+    </div>
+
+  </div>
+
+<script>
+  const noMessages = [
+    "No 😐",
+    "Are you sure? 🥺",
+    "Really? 😢",
+    "Please reconsider! 🙏",
+    "Pretty please? 💕",
+    "Just one coffee! ☕",
+    "I'll pay!! 💳",
+    "Don't do this 😭",
+    "Last chance! 👀",
+    "Fine... 💔"
+  ];
+  let noCount = 0;
+  let yesPad = 16;
+  let yesFontSize = 20;
+
+  const noBtn  = document.getElementById('noBtn');
+  const yesBtn = document.getElementById('yesBtn');
+
+  // Place no button at a random safe spot on screen
+  function placeNoBtn() {
+    const bw = noBtn.offsetWidth  + 10;
+    const bh = noBtn.offsetHeight + 10;
+    const margin = 16;
+    const maxX = window.innerWidth  - bw - margin;
+    const maxY = window.innerHeight - bh - margin;
+    const x = margin + Math.floor(Math.random() * maxX);
+    const y = margin + Math.floor(Math.random() * maxY);
+    noBtn.style.left = x + 'px';
+    noBtn.style.top  = y + 'px';
+  }
+
+  // Initial placement — bottom right, clearly visible
+  window.addEventListener('load', () => {
+    noBtn.style.left = (window.innerWidth  - noBtn.offsetWidth  - 32) + 'px';
+    noBtn.style.top  = (window.innerHeight - noBtn.offsetHeight - 32) + 'px';
+    spawnHearts();
+  });
+
+  function handleNo() {
+    noCount++;
+
+    // Update button text
+    if (noCount < noMessages.length) {
+      noBtn.textContent = noMessages[noCount];
+    }
+
+    // After last message, hide No button completely
+    if (noCount >= noMessages.length) {
+      noBtn.style.opacity = '0';
+      noBtn.style.pointerEvents = 'none';
+    } else {
+      placeNoBtn();
+    }
+
+    // Grow the Yes button each time No is pressed
+    yesPad      = Math.min(yesPad + 7, 56);
+    yesFontSize = Math.min(yesFontSize + 2.5, 36);
+    yesBtn.style.padding  = `${yesPad}px ${yesPad + 28}px`;
+    yesBtn.style.fontSize = `${yesFontSize}px`;
+  }
+
+  function handleYes() {
+    // Hide no button
+    noBtn.style.opacity = '0';
+    noBtn.style.pointerEvents = 'none';
+
+    // Celebrate
+    yesBtn.textContent = '💖 YES!! 💖';
+
+    setTimeout(() => {
+      document.getElementById('askScreen').style.display  = 'none';
+      document.getElementById('formScreen').style.display = 'block';
+    }, 700);
+  }
+
+  function handleSend() {
+    const name  = document.getElementById('nameInput').value.trim();
+    const phone = document.getElementById('phoneInput').value.trim();
+
+    if (!name || !phone) {
+      alert('Please fill in both fields! 💕');
+      return;
+    }
+
+    // 👇 Replace YOUR_EMAIL@example.com with your actual email
+    const subject = encodeURIComponent('☕ Coffee Date Response! 💕');
+    const body    = encodeURIComponent('Name: ' + name + '\nPhone: ' + phone);
+    window.location.href = 'mailto:YOUR_EMAIL@example.com?subject=' + subject + '&body=' + body;
+
+    document.getElementById('formScreen').style.display = 'none';
+    document.getElementById('doneScreen').style.display = 'block';
+  }
+
+  // Spawn floating background hearts
+  function spawnHearts() {
+    const hearts = ['💕','💖','💗','💝','🌸','✨','💫','🌷'];
+    for (let i = 0; i < 16; i++) {
+      const el = document.createElement('div');
+      el.className = 'heart';
+      el.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+      el.style.left = (Math.random() * 100) + 'vw';
+      el.style.fontSize = (12 + Math.random() * 16) + 'px';
+      const dur = 6 + Math.random() * 9;
+      el.style.animationDuration = dur + 's';
+      el.style.animationDelay   = -(Math.random() * dur) + 's';
+      document.body.appendChild(el);
+    }
+  }
+</script>
+</body>
+</html>
