@@ -1,40 +1,354 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coffee Date? ☕💕</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coffee Date? ☕💕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Pacifico&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ffeef8 0%, #ffe4f3 50%, #ffd4ea 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-            position: relative;
-        }
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(160deg, #ffe9f3 0%, #ffd6eb 50%, #ffc2e0 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
 
-        .heart {
-            position: absolute;
-            font-size: 20px;
-            animation: float 6s infinite;
-            opacity: 0.3;
-        }
+    /* Floating background hearts */
+    .bg-heart {
+      position: fixed;
+      font-size: 22px;
+      opacity: 0.18;
+      animation: floatHeart linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes floatHeart {
+      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.18; }
+      90%  { opacity: 0.18; }
+      100% { transform: translateY(-120px) rotate(30deg); opacity: 0; }
+    }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(10deg); }
-        }
+    /* Card */
+    .card {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      border-radius: 36px;
+      padding: 44px 32px 40px;
+      width: 92%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 24px 64px rgba(255, 100, 160, 0.22), 0 2px 8px rgba(255,160,200,0.12);
+      position: relative;
+      z-index: 10;
+    }
 
-        .container {
+    /* Screen toggling */
+    .screen { display: none; }
+    .screen.active { display: block; animation: popIn 0.45s cubic-bezier(.175,.885,.32,1.275); }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* Emoji bounce */
+    .big-emoji {
+      font-size: 72px;
+      display: block;
+      margin-bottom: 18px;
+      animation: bounce 2.2s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+
+    h1 {
+      font-family: 'Pacifico', cursive;
+      color: #f0609e;
+      font-size: 30px;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .subtitle {
+      color: #b06080;
+      font-size: 17px;
+      line-height: 1.6;
+      margin-bottom: 6px;
+    }
+
+    /* ── YES button ── */
+    #yesBtn {
+      background: linear-gradient(135deg, #ff6bab, #ff3d8a);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 19px;
+      padding: 16px 44px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255, 60, 140, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s, padding 0.4s, font-size 0.4s;
+      position: relative;
+      z-index: 20;
+      display: inline-block;
+    }
+    #yesBtn:active { transform: scale(0.96); }
+
+    /* ── NO button ── fixed to viewport so it can roam freely */
+    #noBtn {
+      background: linear-gradient(135deg, #e8e8e8, #d0d0d0);
+      color: #999;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 13px 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+      position: fixed;
+      transition: left 0.25s cubic-bezier(.23,1.2,.32,1), top 0.25s cubic-bezier(.23,1.2,.32,1);
+      z-index: 9999;
+      white-space: nowrap;
+    }
+
+    /* ── Form inputs ── */
+    .input-field {
+      width: 100%;
+      padding: 14px 20px;
+      margin: 10px 0;
+      border: 2.5px solid #ffb3d9;
+      border-radius: 50px;
+      font-size: 15px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      outline: none;
+      color: #c0507a;
+      background: #fff8fc;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .input-field::placeholder { color: #e8a0c0; }
+    .input-field:focus {
+      border-color: #ff6bab;
+      box-shadow: 0 0 0 3px rgba(255,107,171,0.15);
+    }
+
+    .send-btn {
+      background: linear-gradient(135deg, #ff6bab, #ff3d8a);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      padding: 15px 0;
+      width: 100%;
+      margin-top: 8px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255,60,140,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .send-btn:hover { transform: scale(1.02); box-shadow: 0 8px 24px rgba(255,60,140,0.4); }
+    .send-btn:active { transform: scale(0.97); }
+
+    /* Sparkle row */
+    .sparkle-row { font-size: 52px; margin: 10px 0 18px; }
+    .sparkle-row span {
+      display: inline-block;
+      animation: spin 1.6s ease-in-out infinite;
+    }
+    .sparkle-row span:nth-child(2) { animation-delay: 0.2s; }
+    .sparkle-row span:nth-child(3) { animation-delay: 0.4s; }
+    .sparkle-row span:nth-child(4) { animation-delay: 0.6s; }
+    @keyframes spin {
+      0%,100% { transform: scale(1) rotate(0deg); }
+      50%      { transform: scale(1.25) rotate(180deg); }
+    }
+
+    /* Divider hearts */
+    .divider { color: #ffb3d9; letter-spacing: 4px; margin: 14px 0; font-size: 14px; }
+
+    /* Button wrapper in question screen */
+    .btn-area {
+      margin-top: 32px;
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating background hearts (created by JS) -->
+
+  <div class="card">
+
+    <!-- ① Question Screen -->
+    <div class="screen active" id="screenAsk">
+      <span class="big-emoji">☕💕</span>
+      <h1>Coffee Date?</h1>
+      <p class="subtitle">Would you like to grab coffee with me?<br>I promise it'll be the best cup ever! ✨</p>
+      <div class="divider">· · · ♥ · · ·</div>
+      <div class="btn-area">
+        <button id="yesBtn" onclick="handleYes()">Yes! 💖</button>
+      </div>
+    </div>
+
+    <!-- ② Form Screen -->
+    <div class="screen" id="screenForm">
+      <span class="big-emoji">🥰✨</span>
+      <h1>Yay!! 🎉</h1>
+      <p class="subtitle">I'm so happy! Drop your details so I can reach you~ 💌</p>
+      <div class="divider">· · · ♥ · · ·</div>
+      <input class="input-field" type="text" id="nameInput" placeholder="Your beautiful name 💫" />
+      <input class="input-field" type="tel" id="phoneInput" placeholder="Your number 📱" />
+      <button class="send-btn" onclick="handleSubmit()">Send to me! 💌</button>
+    </div>
+
+    <!-- ③ Success Screen -->
+    <div class="screen" id="screenDone">
+      <div class="sparkle-row">
+        <span>✨</span><span>🎉</span><span>💖</span><span>🎊</span>
+      </div>
+      <h1>Got it! 💕</h1>
+      <p class="subtitle">I'll text you soon and we'll sort out our coffee date!<br>Can't wait ☕🌸</p>
+    </div>
+
+  </div>
+
+  <!-- NO button lives outside the card so it can roam the screen -->
+  <button id="noBtn" onclick="handleNo()">No</button>
+
+  <script>
+    /* ── No button messages ── */
+    const noTexts = [
+      "No 😐",
+      "Are you sure? 🥺",
+      "Really really sure?",
+      "Please? 🙏",
+      "Pretty please? 💕",
+      "Just one coffee! ☕",
+      "I'll pay, I promise! 💳",
+      "Don't do this to me 😢",
+      "Last chance! 👀",
+      "...ok fine 💔"
+    ];
+    let noCount = 0;
+
+    /* Position the No button randomly on screen, avoiding edges */
+    function placeNoBtn() {
+      const btn = document.getElementById('noBtn');
+      const bw = btn.offsetWidth  || 120;
+      const bh = btn.offsetHeight || 46;
+      const margin = 12;
+      const maxX = window.innerWidth  - bw - margin;
+      const maxY = window.innerHeight - bh - margin;
+      const x = margin + Math.random() * maxX;
+      const y = margin + Math.random() * maxY;
+      btn.style.left = x + 'px';
+      btn.style.top  = y + 'px';
+    }
+
+    /* Start by placing No button near bottom-right so it's visible initially */
+    window.addEventListener('load', () => {
+      const btn = document.getElementById('noBtn');
+      btn.style.left = (window.innerWidth  - 160) + 'px';
+      btn.style.top  = (window.innerHeight - 80)  + 'px';
+      spawnHearts();
+    });
+
+    function handleNo() {
+      noCount++;
+
+      const noBtn  = document.getElementById('noBtn');
+      const yesBtn = document.getElementById('yesBtn');
+
+      /* Update text */
+      if (noCount < noTexts.length) {
+        noBtn.textContent = noTexts[noCount];
+      }
+
+      /* Hide No button after last message */
+      if (noCount >= noTexts.length) {
+        noBtn.style.display = 'none';
+      }
+
+      /* Escape to a new random spot */
+      placeNoBtn();
+
+      /* Grow YES button */
+      const extraPad = Math.min(noCount * 6, 40);
+      const extraFont = Math.min(noCount * 2, 16);
+      yesBtn.style.padding  = `${16 + extraPad}px ${44 + extraPad}px`;
+      yesBtn.style.fontSize = `${19 + extraFont}px`;
+    }
+
+    function handleYes() {
+      const yesBtn = document.getElementById('yesBtn');
+      const noBtn  = document.getElementById('noBtn');
+
+      /* Hide no button */
+      noBtn.style.display = 'none';
+
+      /* Celebrate briefly */
+      yesBtn.textContent = '💖 YES!! 💖';
+      yesBtn.style.padding  = '22px 56px';
+      yesBtn.style.fontSize = '22px';
+
+      setTimeout(() => switchScreen('screenForm'), 900);
+    }
+
+    function switchScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function handleSubmit() {
+      const name  = document.getElementById('nameInput').value.trim();
+      const phone = document.getElementById('phoneInput').value.trim();
+
+      if (!name || !phone) {
+        document.getElementById('nameInput').style.borderColor  = '#ff6bab';
+        document.getElementById('phoneInput').style.borderColor = '#ff6bab';
+        return;
+      }
+
+      /* ── Send to your email ──
+         Replace YOUR_EMAIL below with your actual email address.
+         This opens the default mail app with the details pre-filled.
+         For a silent/background send, use a service like Formspree or EmailJS. */
+      const subject = encodeURIComponent('☕ Coffee Date Response! 💕');
+      const body    = encodeURIComponent(`Name: ${name}\nPhone: ${phone}`);
+      window.location.href = `mailto:YOUR_EMAIL@example.com?subject=${subject}&body=${body}`;
+
+      switchScreen('screenDone');
+    }
+
+    /* ── Spawn floating background hearts ── */
+    function spawnHearts() {
+      const emojis = ['💕','💖','💗','💝','💓','🌸','✨','💫'];
+      for (let i = 0; i < 14; i++) {
+        const h = document.createElement('div');
+        h.className = 'bg-heart';
+        h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        h.style.left     = Math.random() * 100 + 'vw';
+        h.style.fontSize = (14 + Math.random() * 18) + 'px';
+        const dur = 7 + Math.random() * 8;
+        h.style.animationDuration = dur + 's';
+        h.style.animationDelay   = -(Math.random() * dur) + 's';
+        document.body.appendChild(h);
+      }
+    }
+  </script>
+</body>
+</html>        .container {
             background: white;
             border-radius: 30px;
             padding: 40px 30px;
